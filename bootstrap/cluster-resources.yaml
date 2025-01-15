@@ -42,8 +42,6 @@ spec:
         repoURL: https://github.com/mattfirtion-org/gitops-argocd.git
         targetRevision: main
         path: bootstrap/cluster-resources/{{name}}
-        helm:
-          valuesInline: '{{values}}'
       syncPolicy:
         automated:
           allowEmpty: true
