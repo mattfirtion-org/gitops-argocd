@@ -1,50 +1,50 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
-  creationTimestamp: null
   name: cluster-resources
   namespace: argocd
 spec:
   generators:
-  - git:
-      files:
-      - path: bootstrap/cluster-resources/*.json
-      repoURL: https://github.com/mattfirtion-org/gitops-argocd.git
-      requeueAfterSeconds: 20
-      revision: ""
-      template:
-        metadata: {}
-        spec:
-          destination: {}
-          project: ""
-  syncPolicy:
-    preserveResourcesOnDeletion: true
+  - list:
+      elements:
+      - name: external-dns
+        server: https://kubernetes.default.svc
+        values:
+          provider: aws
+          zoneId: Z1234567890EXAMPLE
+          txtOwnerId: my-identifier
+      - name: app-one
+        server: https://kubernetes.default.svc
+        values:
+          provider: some-provider
+      - name: app-two
+        server: https://kubernetes.default.svc
+        values:
+          provider: another-provider
+      - name: app-three
+        server: https://kubernetes.default.svc
+        values: {}
+      - name: app-four
+        server: https://kubernetes.default.svc
+        values: {}
   template:
     metadata:
-      labels:
-        app.kubernetes.io/managed-by: argocd-autopilot
-        app.kubernetes.io/name: cluster-resources-{{name}}
       name: cluster-resources-{{name}}
-      namespace: argocd
+      labels:
+        app.kubernetes.io/managed-by: argocd
+        app.kubernetes.io/name: cluster-resources
     spec:
       destination:
+        namespace: default
         server: '{{server}}'
-      ignoreDifferences:
-      - group: argoproj.io
-        jsonPointers:
-        - /status
-        kind: Application
       project: default
       source:
-        path: bootstrap/cluster-resources/{{name}}
         repoURL: https://github.com/mattfirtion-org/gitops-argocd.git
+        targetRevision: main
+        path: bootstrap/cluster-resources/{{name}}
+        helm:
+          valuesInline: '{{values}}'
       syncPolicy:
         automated:
           allowEmpty: true
           selfHeal: true
-      parameters:
-      - name: domainFilters
-        value: "foo.com"
-status: {}
