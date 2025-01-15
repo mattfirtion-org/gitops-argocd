@@ -44,9 +44,7 @@ spec:
         automated:
           allowEmpty: true
           selfHeal: true
-      configMapGenerator:
-      - name: cluster-resources-configmap
-        literals:
-        - key1=value1
-        - key2=value2
+      parameters:
+      - name: domainFilters
+        value: "foo.com"
 status: {}
