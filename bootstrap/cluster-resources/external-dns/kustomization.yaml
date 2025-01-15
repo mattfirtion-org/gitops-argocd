@@ -11,6 +11,5 @@ helmCharts:
       provider: aws
       aws:
         region: us-west-2
-      domainFilters:
-        - my-domain.com
+      zoneId: Z1234567890EXAMPLE
       txtOwnerId: my-identifier
